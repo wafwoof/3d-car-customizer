@@ -253,6 +253,35 @@ export function App() {
               }}>Blue</button>
             </ul>
           </div>
+          <div className="controls-option">
+            <h3>Wheel Outer Color</h3>
+            <ul>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
+                  detail: {
+                    color: 0xff0000
+                  }
+                }));
+              }}>Red</button>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
+                  detail: {
+                    color: 0x00ff00
+                  }
+                }));
+              }}>Green</button>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
+                  detail: {
+                    color: 0x0000ff
+                  }
+                }));
+              }}>Blue</button>
+            </ul>
+          </div>
         </ul>
       </div>
       <section className="readme">

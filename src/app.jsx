@@ -1,6 +1,6 @@
 import { render } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
-import './app.css'
+//import './app.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
@@ -49,8 +49,9 @@ export function App() {
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
     loader.setDRACOLoader(dracoLoader);
-    // load the car model
-    loader.load('src/assets/car.gltf', 
+    // load the car model from the preloaded gltf file
+    // https://kaz-test-bucket.s3.amazonaws.com/models/car.gltf
+    loader.load('/models/car.gltf',
       (gltf) => {
         const carModel = gltf.scene;
         // Adjust the scale as needed

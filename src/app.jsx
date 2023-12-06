@@ -59,8 +59,6 @@ export function App() {
         carModel.position.y = -2;
         scene.add(carModel);
         console.log(carModel.children[0]);
-        // Remove loading text when model is loaded
-        document.getElementById('loading-text').style.display = 'none';
         // recursively log each of the car model's children
         let childrenArray = [];
         carModel.traverse((child) => {
@@ -76,16 +74,19 @@ export function App() {
             }
           })
         }
-        document.addEventListener('colorChange', (event) => {
+        // Listen for UI events
+        document.addEventListener('colorChange-body1', (event) => {
           changeLayerColor('Mesh_body014', event.detail.color);
-        })
+        });
+        document.addEventListener('colorChange-body2', (event) => {
+          changeLayerColor('Mesh_body014_1', event.detail.color);
+        });
+        document.addEventListener('colorChange-wheel1', (event) => {
+          changeLayerColor('Mesh_wheel_frontLeft011_2', event.detail.color);
+        });
         // color tests
-        changeLayerColor('Mesh_body014', 0x0000ff);
-        // convert hex to rgb
-        changeLayerColor('Mesh_body014', 0x00ff00);
-        changeLayerColor('Mesh_body014_1', 0x00ff00);
-        changeLayerColor('Mesh_wheel_frontLeft011_2', 0xff00ff);
         //changeLayerColor('Mesh_wheel_frontLeft030', 0xff00ff);
+        //changeLayerColor('Mesh_wheel_frontLeft011_2', 0xff00ff);
 
         // test smooth camera pan
         moveCameraToPosition(4, -0.2, 5);
@@ -111,6 +112,10 @@ export function App() {
       }, 
       (xhr) => {
         console.log('GLTF Model loaded', (xhr.loaded / xhr.total * 100) + '%');
+        setTimeout(() => {
+          // Remove loading text when model is loaded
+          document.getElementById('loading-text').style.display = 'none';
+        }, 500);
       },
       (error) => {
         console.error(error);
@@ -162,11 +167,11 @@ export function App() {
         <canvas id="canvas"></canvas>
         <ul id="controls">
           <div className="controls-option">
-            <h3>Body Color</h3>
+            <h3>Body Color Primary</h3>
             <ul>
               <button className="wheel-option" onClick={() => {
                 // create an event
-                document.dispatchEvent(new CustomEvent('colorChange', {
+                document.dispatchEvent(new CustomEvent('colorChange-body1', {
                   detail: {
                     color: 0xff0000
                   }
@@ -174,7 +179,7 @@ export function App() {
               }}>Red</button>
               <button className="wheel-option" onClick={() => {
                 // create an event
-                document.dispatchEvent(new CustomEvent('colorChange', {
+                document.dispatchEvent(new CustomEvent('colorChange-body1', {
                   detail: {
                     color: 0x00ff00
                   }
@@ -182,7 +187,7 @@ export function App() {
               }}>Green</button>
               <button className="wheel-option" onClick={() => {
                 // create an event
-                document.dispatchEvent(new CustomEvent('colorChange', {
+                document.dispatchEvent(new CustomEvent('colorChange-body1', {
                   detail: {
                     color: 0x0000ff
                   }
@@ -191,15 +196,74 @@ export function App() {
             </ul>
           </div>
           <div className="controls-option">
-            <h3>Wheels</h3>
+            <h3>Body Color Secondary</h3>
             <ul>
-              <button className="wheel-option">Option 1</button>
-              <button className="wheel-option">Option 2</button>
-              <button className="wheel-option">Option 3</button>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-body2', {
+                  detail: {
+                    color: 0xff0000
+                  }
+                }));
+              }}>Red</button>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-body2', {
+                  detail: {
+                    color: 0x00ff00
+                  }
+                }));
+              }}>Green</button>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-body2', {
+                  detail: {
+                    color: 0x0000ff
+                  }
+                }));
+              }}>Blue</button>
+            </ul>
+          </div>
+          <div className="controls-option">
+            <h3>Wheel Inner Color</h3>
+            <ul>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
+                  detail: {
+                    color: 0xff0000
+                  }
+                }));
+              }}>Red</button>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
+                  detail: {
+                    color: 0x00ff00
+                  }
+                }));
+              }}>Green</button>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
+                  detail: {
+                    color: 0x0000ff
+                  }
+                }));
+              }}>Blue</button>
             </ul>
           </div>
         </ul>
       </div>
+      <section className="readme">
+        <h2>Readme</h2>
+        <p>3D Car Customizer Demo</p>
+        <p>By Kazei McQuaid</p>
+        <span>
+          Don't worry if this doesn't get used for anything.
+          Very rough draft. Here is my <a href='https://github.com/wafwoof'>Github</a>.
+        </span>
+      </section>
     </>
   )
 }

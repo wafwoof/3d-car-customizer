@@ -8,11 +8,10 @@
   width: 100vw;
   height: 100dvh;
   background-color: #f5f5f5;
-
 }
 
 h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   padding: 8px;
 }
 
@@ -20,9 +19,10 @@ h1 {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -300%);
+  transform: translate(-85%, -175%);
   font-size: 3rem;
   color: black;
+  z-index: 100;
 }
 
 #customizer {
@@ -36,7 +36,7 @@ h1 {
   max-height: 60vh;
 }
 #customizer #canvas:hover {
-  cursor: pointer;
+  cursor: grab;
 }
 #customizer #canvas:active {
   cursor: grabbing;
@@ -51,42 +51,37 @@ h1 {
   align-items: flex-start;
 }
 #customizer #controls {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+  max-height: 60vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 #customizer #controls .controls-option {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
   min-width: 100%;
   min-height: 80px;
   padding: 4px;
-  margin-top: 5%;
   border-bottom: 1px solid black;
+  flex-grow: 1; /* Add this line */
 }
 #customizer #controls .controls-option h3 {
-  font-size: 2.5rem;
-  padding: 16px;
-  font-weight: 400;
-}
-#customizer #controls .controls-option ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+  font-size: 1.4rem;
+  margin: 4px;
 }
 #customizer #controls .controls-option button {
-  font-size: 1.5rem;
-  font-weight: 400;
-  padding: 4px;
-  border: 1px solid black;
-  border-radius: 4px;
+  width: 100%;
+  height: 40px;
+  font-size: 1.2rem;
+  border: outset 1px solid black;
   background-color: rgb(255, 255, 255);
   color: black;
   cursor: pointer;
 }
 #customizer #controls .controls-option button:active {
-  background-color: rgb(0, 0, 0);
-  color: white;
+  border: inset 1px solid black;
+}
+
+.readme p, span {
+  font-size: 1rem;
+  white-space: pre-wrap;
 }

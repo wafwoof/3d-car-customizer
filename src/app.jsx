@@ -29,6 +29,8 @@ export function App() {
     renderer.setClearColor(0xffffff, 1);
     // add light to scene
     const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+    // increase light intensity
+    light.intensity = 1.5;
     light.position.set(0, 20, 0);
     scene.add(light);
     // add a blue gradient skybox to the scene
@@ -84,7 +86,11 @@ export function App() {
         document.addEventListener('colorChange-wheel1', (event) => {
           changeLayerColor('Mesh_wheel_frontLeft011_2', event.detail.color);
         });
+        document.addEventListener('colorChange-windshield', (event) => {
+          changeLayerColor('Mesh_body014_2', event.detail.color);
+        });
         // color tests
+        // Mesh_body014_2 = windshield
         //changeLayerColor('Mesh_wheel_frontLeft030', 0xff00ff);
         //changeLayerColor('Mesh_wheel_frontLeft011_2', 0xff00ff);
 
@@ -254,11 +260,11 @@ export function App() {
             </ul>
           </div>
           <div className="controls-option">
-            <h3>Wheel Outer Color</h3>
+            <h3>Windshield Color</h3>
             <ul>
               <button className="wheel-option" onClick={() => {
                 // create an event
-                document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
+                document.dispatchEvent(new CustomEvent('colorChange-windshield', {
                   detail: {
                     color: 0xff0000
                   }
@@ -266,7 +272,7 @@ export function App() {
               }}>Red</button>
               <button className="wheel-option" onClick={() => {
                 // create an event
-                document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
+                document.dispatchEvent(new CustomEvent('colorChange-windshield', {
                   detail: {
                     color: 0x00ff00
                   }
@@ -274,7 +280,7 @@ export function App() {
               }}>Green</button>
               <button className="wheel-option" onClick={() => {
                 // create an event
-                document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
+                document.dispatchEvent(new CustomEvent('colorChange-windshield', {
                   detail: {
                     color: 0x0000ff
                   }
@@ -292,6 +298,12 @@ export function App() {
           Don't worry if this doesn't get used for anything.
           Very rough draft. Here is my <a href='https://github.com/wafwoof'>Github</a>.
         </span>
+        <h2>Features</h2>
+        <p>- Scroll to zoom in and out</p>
+        <p>- Click and drag to rotate camera</p>
+        <p>- 1, 2, 3, 4 Keys will change to preset camera-angles</p>
+        <p>- Scrollable Customizaiton Menu</p>
+        <p>- Ultra Realistic Skybox & Car Model</p>
       </section>
     </>
   )

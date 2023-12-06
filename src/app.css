@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#app {
+  width: 100vw;
+  height: 100dvh;
+  background-color: #f5f5f5;
+
+}
+
+h1 {
+  font-size: 2.5rem;
+  padding: 8px;
+}
+
+#loading-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -300%);
+  font-size: 3rem;
+  color: black;
+}
+
+#customizer {
+  display: flex;
+  flex-direction: row;
+  overflow-x: hidden;
+}
+#customizer #canvas {
+  position: relative;
+  max-width: 80%;
+  max-height: 60vh;
+}
+#customizer #canvas:hover {
+  cursor: pointer;
+}
+#customizer #canvas:active {
+  cursor: grabbing;
+}
+#customizer #controls {
+  width: 20%;
+  min-height: 100%;
+  background-color: rgb(178, 178, 178);
+  border-left: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+#customizer #controls {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+#customizer #controls .controls-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 100%;
+  min-height: 80px;
+  padding: 4px;
+  margin-top: 5%;
+  border-bottom: 1px solid black;
+}
+#customizer #controls .controls-option h3 {
+  font-size: 2.5rem;
+  padding: 16px;
+  font-weight: 400;
+}
+#customizer #controls .controls-option ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+#customizer #controls .controls-option button {
+  font-size: 1.5rem;
+  font-weight: 400;
+  padding: 4px;
+  border: 1px solid black;
+  border-radius: 4px;
+  background-color: rgb(255, 255, 255);
+  color: black;
+  cursor: pointer;
+}
+#customizer #controls .controls-option button:active {
+  background-color: rgb(0, 0, 0);
+  color: white;
+}

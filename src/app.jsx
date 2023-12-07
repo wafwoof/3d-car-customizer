@@ -60,22 +60,36 @@ export function App() {
         carModel.scale.set(2, 2, 2);
         carModel.position.y = -2;
         scene.add(carModel);
-        console.log(carModel.children[0]);
+        console.log("Car Model", carModel.children[0].children[0]);
         // recursively log each of the car model's children
         let childrenArray = [];
         carModel.traverse((child) => {
           childrenArray.push(child.name);
         })
-        console.log("Layers/meshes:", childrenArray);
+        // do the same for each of the models materials and log their names
+        let materialsArray = [];
+        carModel.traverse((child) => {
+          if (child.material) {
+            materialsArray.push(child.material.name);
+          }
+        })
+        console.log("Children", childrenArray);
+        console.log("Materials", materialsArray);
         // changeLayerColor function
         function changeLayerColor(mesh, color) {
           carModel.traverse((child) => {
             if (child.name === mesh) {
-              child.material.color.setHex(color);
+              try {
+                child.material.emissive = new THREE.Color(color);
+              } catch (error) {
+                child.material.color.setHex(color);
+              }
               console.info("Mesh", mesh, "color changed to", color);
             }
           })
         }
+        // color tests
+        //changeLayerColor('Mesh_wheel_frontLeft030', 0x00ffff);
         // Listen for UI events
         document.addEventListener('colorChange-body1', (event) => {
           changeLayerColor('Mesh_body014', event.detail.color);
@@ -84,16 +98,14 @@ export function App() {
           changeLayerColor('Mesh_body014_1', event.detail.color);
         });
         document.addEventListener('colorChange-wheel1', (event) => {
-          changeLayerColor('Mesh_wheel_frontLeft011_2', event.detail.color);
+          changeLayerColor('Mesh_wheel_frontLeft028', event.detail.color);
+        });
+        document.addEventListener('colorChange-wheel2', (event) => {
+          changeLayerColor('Mesh_wheel_frontLeft028_2', event.detail.color);
         });
         document.addEventListener('colorChange-windshield', (event) => {
           changeLayerColor('Mesh_body014_2', event.detail.color);
         });
-        // color tests
-        // Mesh_body014_2 = windshield
-        //changeLayerColor('Mesh_wheel_frontLeft030', 0xff00ff);
-        //changeLayerColor('Mesh_wheel_frontLeft011_2', 0xff00ff);
-
         // test smooth camera pan
         moveCameraToPosition(4, -0.2, 5);
         // hookeup wasd controls
@@ -147,13 +159,6 @@ export function App() {
         .easing(TWEEN.Easing.Quadratic.Out)
         .start();
     }
-
-    // DEBUG: on keydown P
-    document.addEventListener('keydown', (event) => {
-      if (event.key == 'p') {
-        console.log("camera rotation", controls)
-      }
-    })
 
     // render scene
     const animate = function () {
@@ -231,7 +236,7 @@ export function App() {
             </ul>
           </div>
           <div className="controls-option">
-            <h3>Wheel Inner Color</h3>
+            <h3>Wheel Tire Color</h3>
             <ul>
               <button className="wheel-option" onClick={() => {
                 // create an event
@@ -252,6 +257,35 @@ export function App() {
               <button className="wheel-option" onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
+                  detail: {
+                    color: 0x0000ff
+                  }
+                }));
+              }}>Blue</button>
+            </ul>
+          </div>
+          <div className="controls-option">
+            <h3>Wheel Rim Color</h3>
+            <ul>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
+                  detail: {
+                    color: 0xff0000
+                  }
+                }));
+              }}>Red</button>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
+                  detail: {
+                    color: 0x00ff00
+                  }
+                }));
+              }}>Green</button>
+              <button className="wheel-option" onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
                   detail: {
                     color: 0x0000ff
                   }

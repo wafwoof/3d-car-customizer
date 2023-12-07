@@ -1,6 +1,6 @@
 import { render } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
-//import './app.css'
+import './app.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
@@ -28,10 +28,13 @@ export function App() {
     // set background color white
     renderer.setClearColor(0xffffff, 1);
     // add light to scene
-    const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const light = new THREE.DirectionalLight(0xffffff, 0x444444);
     // increase light intensity
-    light.intensity = 1.5;
-    light.position.set(0, 20, 0);
+    light.intensity = 5;
+    light.castShadow = true;
+    light.position.set(10, 20, 3);
     scene.add(light);
     // add a blue gradient skybox to the scene
     const skyboxGeometry = new THREE.BoxGeometry(1000, 1000, 1000);
@@ -330,7 +333,7 @@ export function App() {
         <p>By Kazei McQuaid</p>
         <span>
           Don't worry if this doesn't get used for anything.
-          Very rough draft. Here is my <a href='https://github.com/wafwoof'>Github</a>.
+          Very rough draft.
         </span>
         <h2>Features</h2>
         <p>- Scroll to zoom in and out</p>

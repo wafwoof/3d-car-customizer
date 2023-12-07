@@ -80,7 +80,7 @@ export function App() {
           carModel.traverse((child) => {
             if (child.name === mesh) {
               try {
-                child.material.emissive = new THREE.Color(color);
+                child.material.emissive.setHex(color);
               } catch (error) {
                 child.material.color.setHex(color);
               }

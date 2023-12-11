@@ -1,5 +1,6 @@
 import { render } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import './app.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'

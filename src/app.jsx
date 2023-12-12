@@ -10,33 +10,36 @@ import TWEEN from '@tweenjs/tween.js'
 
 export function App() {
   useEffect(() => {
-    // bootstrap three.js scene
-    var HEIGHT = window.innerHeight - 350;
-    var WIDTH = window.innerWidth;
+    // BEGIN SETTING UP THREE.JS SCENE/CANVAS
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(85, WIDTH / HEIGHT, 0.1, 1000);
     const canvas = document.getElementById('canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
-    renderer.setSize(window.innerWidth, HEIGHT);
-    window.addEventListener('resize', () => {
-      // recalculate HEIGHT and WIDTH on window resize
-      HEIGHT = window.innerHeight - 350;
-      WIDTH = window.innerWidth;
-      renderer.setSize(WIDTH, HEIGHT);
-      camera.aspect = WIDTH / HEIGHT;
-      camera.updateProjectionMatrix();
-    });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    const WIDTH = canvas.clientWidth;
+    const HEIGHT = canvas.clientHeight;
+    const camera = new THREE.PerspectiveCamera(90, WIDTH / HEIGHT, 0.1, 1000);
+    // Canvas reszing function
+    function resizeCanvasToDisplaySize() {
+      let width = canvas.clientWidth;
+      let height = canvas.clientHeight;
+      // adjust displayBuffer size to match
+      if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+        // you must pass false here or three.js sadly fights the browser
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+    
+        // update any render target sizes here
+      }
+    }
     // set background color white
     renderer.setClearColor(0xffffff, 1);
     // add light to scene
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 5);
     scene.add(ambientLight);
-    const light = new THREE.DirectionalLight(0xffffff, 0x444444);
-    // increase light intensity
-    light.intensity = 5;
-    light.castShadow = true;
-    light.position.set(10, 20, 3);
-    scene.add(light);
+    // add directional light to scene
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
+    directionalLight.position.set(25, 16, 20);
+    scene.add(directionalLight);
     // add a blue gradient skybox to the scene
     const skyboxGeometry = new THREE.BoxGeometry(1000, 1000, 1000);
     const skyboxMaterial = new THREE.MeshBasicMaterial({ color: 0x88ccff, side: THREE.BackSide });
@@ -164,19 +167,36 @@ export function App() {
         .start();
     }
 
+    // press r to rotate camera
+    let rotationSpeed = 0.01;
+    document.addEventListener('keydown', (event) => {
+      if (event.key == 'r' && rotationSpeed == 0) {
+        rotationSpeed = 0.01;
+        console.log("Rotation Speed", rotationSpeed)
+      }
+      else if (event.key == 'r' && rotationSpeed == 0.01) {
+        rotationSpeed = 0;
+        console.log("Rotation Speed", rotationSpeed)
+      }
+    })
+
     // render scene
     const animate = function () {
-      requestAnimationFrame(animate);
+      resizeCanvasToDisplaySize();
       TWEEN.update();
+      // rotate by rotationSpeed
+      scene.rotation.y += rotationSpeed;
+
       camera.lookAt(scene.position);
       renderer.render(scene, camera);
+      requestAnimationFrame(animate);
     };
     animate();
   }, [])
 
   return (
     <>
-      <h1>3d Car Customizer Demo</h1>
+      <h1>Demonstration purposes only.</h1>
       <h2 id="loading-text">Loading...</h2>
       <div id="customizer">
         <canvas id="canvas"></canvas>
@@ -328,20 +348,19 @@ export function App() {
           </div>
         </ul>
       </div>
-      <section className="readme">
-        <h2>Readme</h2>
-        <p>3D Car Customizer Demo</p>
-        <p>By Kazei McQuaid</p>
-        <span>
-          Don't worry if this doesn't get used for anything.
-          Very rough draft.
-        </span>
-        <h2>Features</h2>
-        <p>- Scroll to zoom in and out</p>
-        <p>- Click and drag to rotate camera</p>
-        <p>- 1, 2, 3, 4 Keys will change to preset camera-angles</p>
-        <p>- Scrollable Customizaiton Menu</p>
-        <p>- Ultra Realistic Skybox & Car Model</p>
+      <section id="readme">
+        <section className="text-area">
+          <h2>3D GLTF Customizer</h2>
+          <p>Built By: Kazei McQuaid</p>
+          <p>Purpose: 3D GLTF Customizer is a React-compatible Model viewer/customizer Component.</p>
+          <h2>Features</h2>
+          <ul>
+            <li>- 1, 2, 3, 4 keys to move camera to preset angles.</li>
+            <li>- R key to put the Model on a lazy susan.</li>
+            <li>- Click, Drag, and Scoll/Pinch to rotate and zoom camera.</li>
+            <li>- Dynamic Canvas resizing.</li>
+          </ul>
+        </section>
       </section>
     </>
   )

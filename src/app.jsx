@@ -13,7 +13,8 @@ export function App() {
     // BEGIN SETTING UP THREE.JS SCENE/CANVAS
     const scene = new THREE.Scene();
     const canvas = document.getElementById('canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false }); // WebGL
+    renderer.setPixelRatio(window.devicePixelRatio);
     const WIDTH = canvas.clientWidth;
     const HEIGHT = canvas.clientHeight;
     const camera = new THREE.PerspectiveCamera(90, WIDTH / HEIGHT, 0.1, 1000);
@@ -196,10 +197,10 @@ export function App() {
 
   return (
     <>
-      <h1>Demonstration purposes only.</h1>
+      <h1>(demonstration purposes only)</h1>
       <h2 id="loading-text">Loading...</h2>
       <div id="customizer">
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" ></canvas>
         <ul id="controls">
           <div className="controls-option">
             <h3>Body Color Primary</h3>
@@ -351,8 +352,9 @@ export function App() {
       <section id="readme">
         <section className="text-area">
           <h2>3D GLTF Customizer</h2>
+          <p>Version: 0.2</p>
           <p>Built By: Kazei McQuaid</p>
-          <p>Purpose: 3D GLTF Customizer is a React-compatible Model viewer/customizer Component.</p>
+          <p>Purpose: 3D Car Customizer is a React-compatible Model viewer/customizer Component.</p>
           <h2>Features</h2>
           <ul>
             <li>- 1, 2, 3, 4 keys to move camera to preset angles.</li>

@@ -1,6 +1,6 @@
 import { render } from 'preact';
 import { useEffect } from 'preact/hooks';
-import { injectSpeedInsights } from "@vercel/speed-insights";
+import { SpeedInsights } from "@vercel/speed-insights/react"
 import './app.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -447,6 +447,7 @@ export function App() {
           </ul>
         </section>
       </section>
+      <SpeedInsights/>
     </>
   )
 }

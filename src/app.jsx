@@ -1,14 +1,15 @@
-import { render } from 'preact'
-import { useState, useEffect } from 'preact/hooks'
-import { injectSpeedInsights } from "@vercel/speed-insights"
-import './app.css'
-import * as THREE from 'three'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
-import TWEEN from '@tweenjs/tween.js'
+import { render } from 'preact';
+import { useEffect } from 'preact/hooks';
+import { injectSpeedInsights } from "@vercel/speed-insights";
+import './app.css';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import TWEEN from '@tweenjs/tween.js';
 
 export function App() {
+
   useEffect(() => {
     // BEGIN SETTING UP THREE.JS SCENE/CANVAS
     const scene = new THREE.Scene();
@@ -28,10 +29,9 @@ export function App() {
         renderer.setSize(width, height, false);
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
-    
         // update any render target sizes here
-      }
-    }
+      };
+    };
     // set background color white
     renderer.setClearColor(0xffffff, 1);
     // add light to scene
@@ -62,104 +62,123 @@ export function App() {
     // load the car model from the preloaded gltf file
     // https://kaz-test-bucket.s3.amazonaws.com/models/car.gltf
     loader.load('/models/car.gltf',
-      (gltf) => {
-        const carModel = gltf.scene;
-        // Adjust the scale as needed
-        carModel.scale.set(2, 2, 2);
-        carModel.position.y = -2;
-        scene.add(carModel);
-        console.log("Car Model", carModel.children[0].children[0]);
-        // recursively log each of the car model's children
-        let childrenArray = [];
-        carModel.traverse((child) => {
-          childrenArray.push(child.name);
-        })
-        // do the same for each of the models materials and log their names
-        let materialsArray = [];
-        carModel.traverse((child) => {
-          if (child.material) {
-            materialsArray.push(child.material.name);
-          }
-        })
-        console.log("Children", childrenArray);
-        console.log("Materials", materialsArray);
-        // changeLayerColor function
-        function changeLayerColor(mesh, color) {
-          carModel.traverse((child) => {
-            if (child.name === mesh) {
-              try {
-                child.material.emissive.setHex(color);
-              } catch (error) {
-                child.material.color.setHex(color);
-              }
-              console.info("Mesh", mesh, "color changed to", color);
-            }
-          })
-        }
-        // color tests
-        //changeLayerColor('Mesh_wheel_frontLeft030', 0x00ffff);
-        // Listen for UI events
-        document.addEventListener('colorChange-body1', (event) => {
-          changeLayerColor('Mesh_body014', event.detail.color);
-        });
-        document.addEventListener('colorChange-body2', (event) => {
-          changeLayerColor('Mesh_body014_1', event.detail.color);
-        });
-        document.addEventListener('colorChange-wheel1', (event) => {
-          changeLayerColor('Mesh_wheel_frontLeft028', event.detail.color);
-        });
-        document.addEventListener('colorChange-wheel2', (event) => {
-          changeLayerColor('Mesh_wheel_frontLeft028_2', event.detail.color);
-        });
-        document.addEventListener('colorChange-windshield', (event) => {
-          changeLayerColor('Mesh_body014_2', event.detail.color);
-        });
-        // test smooth camera pan
-        moveCameraToPosition(4, -0.2, 5);
-        // hookeup wasd controls
-        document.addEventListener('keydown', (event) => {
-          if (event.key == '1') {
-            moveCameraToPosition(0, 0, 5);
-            console.info("Moving to position 1:", camera.position.x, camera.position.y, camera.position.z);
-          }
-          if (event.key == '2') {
-            moveCameraToPosition(4, -0, 5); 
-            console.info("Moving to position 2:", camera.position.x, camera.position.y, camera.position.z);
-          }
-          if (event.key == '3') {
-            moveCameraToPosition(4, -0, -0.5); 
-            console.info("Moving to position 3:", camera.position.x, camera.position.y, camera.position.z);
-          }
-          if (event.key == '4') {
-            moveCameraToPosition(4, -1, -0.5);
-            console.info("Moving to position 4:", camera.position.x, camera.position.y, camera.position.z);
-          }
-        })
-      }, 
-      (xhr) => {
-        console.log('GLTF Model loaded', (xhr.loaded / xhr.total * 100) + '%');
-        setTimeout(() => {
-          // Remove loading text when model is loaded
-          document.getElementById('loading-text').style.display = 'none';
-        }, 500);
-      },
-      (error) => {
-        console.error(error);
-      });
+        (gltf) => {
+          var carModel = gltf.scene;
+          // Adjust the scale as needed
+          carModel.scale.set(2, 2, 2);
+          carModel.position.y = -2;
+          scene.add(carModel);
+          //carModel = scene;
+          console.log("Car Model", carModel);
+          // SCENE MODEL CUSTOMIZATION FUNCTIONS
+          // storeModelMaterials() function
+          function storeModelMaterials() {
+            let completedMaterials = [];
+            let materialBank = {};
+            carModel.traverse((child) => {
+              if ('material' in child) {
+                if (!completedMaterials.includes(child['material']['name'])) {
+                  materialBank[child['material']['name']] = child['material'];
+                  completedMaterials.push(child['material']['name']);
+                };
+              };
+            });
+            console.log(`Loaded (${completedMaterials.length}) Materials from Parent:`, completedMaterials);
+            return materialBank;
+          };
+          const materialBank = storeModelMaterials();
+          console.log("Material Bank", materialBank);
 
-    // move camera back and up
+          // swapLayerMaterial() function
+          function swapLayerMaterial(mesh, material) {
+            carModel.traverse((child) => {
+              if (child.name === mesh) {
+                child.material = material.clone();
+              };
+            });
+            console.info(mesh, "material swapped to", material.name);
+          };
+
+          // changeLayerColor function
+          async function changeLayerColor(mesh, color) {
+            carModel.traverse((child) => {
+              if (child.name === mesh) {
+                child.material.color.setHex(color);
+                console.info("Mesh", mesh, "color changed to", color);
+              };
+            });
+          };
+
+          // Listen for UI events
+          document.addEventListener('colorChange-body1', (event) => {
+            changeLayerColor('Mesh_body014', event.detail.color);
+          });
+          document.addEventListener('colorChange-body2', (event) => {
+            changeLayerColor('Mesh_body014_1', event.detail.color);
+          });
+          document.addEventListener('materialSwap-body1', (event) => {
+            swapLayerMaterial('Mesh_body014', materialBank[event.detail.name]);
+          });
+          document.addEventListener('materialSwap-body2', (event) => {
+            swapLayerMaterial('Mesh_body014_1', materialBank[event.detail.name]);
+          });
+          document.addEventListener('colorChange-wheel1', (event) => {
+            changeLayerColor('Mesh_wheel_frontLeft028', event.detail.color);
+          });
+          document.addEventListener('colorChange-wheel2', (event) => {
+            changeLayerColor('Mesh_wheel_frontLeft028_2', event.detail.color);
+          });
+          document.addEventListener('colorChange-windshield', (event) => {
+            changeLayerColor('Mesh_body014_2', event.detail.color);
+          });
+          document.addEventListener('materialSwap-windshield', (event) => {
+            swapLayerMaterial('Mesh_body014_2', materialBank[event.detail.name]);
+          });
+          // test smooth camera pan
+          moveCameraToPosition(4, -0.2, 5);
+          // hookeup wasd controls
+          document.addEventListener('keydown', (event) => {
+            if (event.key == '1') {
+              moveCameraToPosition(0, 0, 5);
+              console.info("Moving to position 1:", camera.position.x, camera.position.y, camera.position.z);
+            }
+            if (event.key == '2') {
+              moveCameraToPosition(4, -0, 5); 
+              console.info("Moving to position 2:", camera.position.x, camera.position.y, camera.position.z);
+            }
+            if (event.key == '3') {
+              moveCameraToPosition(4, -0, -0.5); 
+              console.info("Moving to position 3:", camera.position.x, camera.position.y, camera.position.z);
+            }
+            if (event.key == '4') {
+              moveCameraToPosition(4, -1, -0.5);
+              console.info("Moving to position 4:", camera.position.x, camera.position.y, camera.position.z);
+            }
+          });
+        }, 
+        (xhr) => {
+          console.info('GLTF Model loaded', (xhr.loaded / xhr.total * 100) + '%');
+          setTimeout(() => {
+            // Remove loading text when model is loaded
+            document.getElementById('loading-text').style.display = 'none';
+          }, 500);
+        },
+        (error) => {
+          console.error(error);
+        });
+
+    // Configure camera and controls
     camera.position.z = 5;
-    // add orbit controls and render scene
     const controls = new OrbitControls(camera, renderer.domElement); 
-    // lock controls to x axis
+    // Lock controls to x axis
     controls.minPolarAngle = Math.PI / 2;
     controls.maxPolarAngle = Math.PI / 2;
     controls.enablePan = false;
-    // lock distance from center
+    // Lock distance from center
     controls.minDistance = 4;
     controls.maxDistance = 8;
     controls.update();
-    console.log("Controls", controls)
+    //console.log("Controls", controls)
     // function smoothly move camera to new position
     function moveCameraToPosition(x, y, z) {
       new TWEEN.Tween(camera.position)
@@ -168,7 +187,7 @@ export function App() {
         .start();
     }
 
-    // press r to rotate camera
+    // Press R to rotate camera
     let rotationSpeed = 0.01;
     document.addEventListener('keydown', (event) => {
       if (event.key == 'r' && rotationSpeed == 0) {
@@ -183,14 +202,14 @@ export function App() {
 
     // render scene
     const animate = function () {
+      requestAnimationFrame(animate);
+
       resizeCanvasToDisplaySize();
       TWEEN.update();
-      // rotate by rotationSpeed
-      scene.rotation.y += rotationSpeed;
-
+      scene.rotation.y += rotationSpeed; // Lazy Susan
       camera.lookAt(scene.position);
+
       renderer.render(scene, camera);
-      requestAnimationFrame(animate);
     };
     animate();
   }, [])
@@ -205,7 +224,7 @@ export function App() {
           <div className="controls-option">
             <h3>Body Color Primary</h3>
             <ul>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-body1', {
                   detail: {
@@ -213,7 +232,7 @@ export function App() {
                   }
                 }));
               }}>Red</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-body1', {
                   detail: {
@@ -221,7 +240,7 @@ export function App() {
                   }
                 }));
               }}>Green</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-body1', {
                   detail: {
@@ -229,12 +248,33 @@ export function App() {
                   }
                 }));
               }}>Blue</button>
+            </ul>
+          </div>
+          <div className="controls-option">
+            <h3>Body Material Primary</h3>
+            <ul>
+              <button onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('materialSwap-body1', {
+                  detail: {
+                    name: 'paintRed'
+                  }
+                }));
+              }}>Glossy Red Paint</button>
+              <button onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('materialSwap-body1', {
+                  detail: {
+                    name: 'plastic'
+                  }
+                }));
+              }}>PVC Model Plastic</button>
             </ul>
           </div>
           <div className="controls-option">
             <h3>Body Color Secondary</h3>
             <ul>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-body2', {
                   detail: {
@@ -242,7 +282,7 @@ export function App() {
                   }
                 }));
               }}>Red</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-body2', {
                   detail: {
@@ -250,7 +290,7 @@ export function App() {
                   }
                 }));
               }}>Green</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-body2', {
                   detail: {
@@ -261,9 +301,30 @@ export function App() {
             </ul>
           </div>
           <div className="controls-option">
+            <h3>Body Material Secondary</h3>
+            <ul>
+              <button onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('materialSwap-body2', {
+                  detail: {
+                    name: 'paintRed'
+                  }
+                }));
+              }}>Glossy Red Paint</button>
+              <button onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('materialSwap-body2', {
+                  detail: {
+                    name: 'plastic'
+                  }
+                }));
+              }}>PVC Model Plastic</button>
+            </ul>
+          </div>
+          <div className="controls-option">
             <h3>Wheel Tire Color</h3>
             <ul>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
                   detail: {
@@ -271,7 +332,7 @@ export function App() {
                   }
                 }));
               }}>Red</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
                   detail: {
@@ -279,7 +340,7 @@ export function App() {
                   }
                 }));
               }}>Green</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
                   detail: {
@@ -292,7 +353,7 @@ export function App() {
           <div className="controls-option">
             <h3>Wheel Rim Color</h3>
             <ul>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
                   detail: {
@@ -300,7 +361,7 @@ export function App() {
                   }
                 }));
               }}>Red</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
                   detail: {
@@ -308,7 +369,7 @@ export function App() {
                   }
                 }));
               }}>Green</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-wheel2', {
                   detail: {
@@ -321,7 +382,7 @@ export function App() {
           <div className="controls-option">
             <h3>Windshield Color</h3>
             <ul>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-windshield', {
                   detail: {
@@ -329,7 +390,7 @@ export function App() {
                   }
                 }));
               }}>Red</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-windshield', {
                   detail: {
@@ -337,7 +398,7 @@ export function App() {
                   }
                 }));
               }}>Green</button>
-              <button className="wheel-option" onClick={() => {
+              <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-windshield', {
                   detail: {
@@ -347,12 +408,33 @@ export function App() {
               }}>Blue</button>
             </ul>
           </div>
+          <div className="controls-option">
+            <h3>Windshield Material</h3>
+            <ul>
+              <button onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('materialSwap-windshield', {
+                  detail: {
+                    name: 'window'
+                  }
+                }));
+              }}>Window Glass</button>
+              <button onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('materialSwap-windshield', {
+                  detail: {
+                    name: 'plastic'
+                  }
+                }));
+              }}>PVC Model Plastic</button>
+            </ul>
+          </div>
         </ul>
       </div>
       <section id="readme">
         <section className="text-area">
           <h2>3D GLTF Customizer</h2>
-          <p>Version: 0.2</p>
+          <p>Version: 0.0.4</p>
           <p>Built By: Kazei McQuaid</p>
           <p>Purpose: 3D Car Customizer is a React-compatible Model viewer/customizer Component.</p>
           <h2>Features</h2>
@@ -361,6 +443,7 @@ export function App() {
             <li>- R key to put the Model on a lazy susan.</li>
             <li>- Click, Drag, and Scoll/Pinch to rotate and zoom camera.</li>
             <li>- Dynamic Canvas resizing.</li>
+            <li>- Material Swapping & Cloning.</li>
           </ul>
         </section>
       </section>

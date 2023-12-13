@@ -11,7 +11,7 @@
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 1rem;
   padding: 8px;
 }
 
@@ -64,7 +64,7 @@ h1 {
   flex-grow: 1; /* Add this line */
 }
 #customizer #controls .controls-option h3 {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   margin: 4px;
   user-select: none;
 }
@@ -89,7 +89,7 @@ h1 {
   padding: 8px;
 }
 #readme .text-area h2 {
-  font-size: 2rem;
+  font-size: 1.75rem;
 }
 .text-area #readme p {
   font-size: 1.5rem;

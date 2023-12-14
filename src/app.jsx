@@ -72,6 +72,7 @@ export function App() {
           carModel.scale.set(2.5, 2.5, 2.5);
           carModel.position.y = -2;
           scene.add(carModel);
+          setTimeout(() => { document.getElementById('loading-text').style.display = 'none'; }, 100);
           console.log("Car Model", carModel);
           // Testing Animation
           try {
@@ -169,13 +170,6 @@ export function App() {
         }, 
         (xhr) => {
           //console.info('GLTF Model loaded', (xhr.loaded / xhr.total * 100) + '%');
-          if ((xhr.loaded / xhr.total * 100) == 100 || (xhr.loaded / xhr.total * 100) == Infinity) {
-            console.info('GLTF Model loaded');
-            setTimeout(() => {
-              // Remove loading text when model is loaded
-              document.getElementById('loading-text').style.display = 'none';
-            }, 100);
-          }
         },
         (error) => {
           console.error(error);

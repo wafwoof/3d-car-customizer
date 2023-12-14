@@ -14,11 +14,12 @@ export function App() {
     // BEGIN SETTING UP THREE.JS SCENE/CANVAS
     const scene = new THREE.Scene();
     const canvas = document.getElementById('canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false }); // WebGL
-    renderer.setPixelRatio(window.devicePixelRatio);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, }); // WebGLRenderer
+    renderer.setClearColor(0xffffff, 1); // Background Color White
+    renderer.setPixelRatio(window.devicePixelRatio); // fix pixel ratio
     const WIDTH = canvas.clientWidth;
     const HEIGHT = canvas.clientHeight;
-    const camera = new THREE.PerspectiveCamera(90, WIDTH / HEIGHT, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 1000);
     // Canvas reszing function
     function resizeCanvasToDisplaySize() {
       let width = canvas.clientWidth;
@@ -32,15 +33,17 @@ export function App() {
         // update any render target sizes here
       };
     };
-    // set background color white
-    renderer.setClearColor(0xffffff, 1);
     // add light to scene
-    const ambientLight = new THREE.AmbientLight(0xffffff, 5);
-    scene.add(ambientLight);
-    // add directional light to scene
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
-    directionalLight.position.set(25, 16, 20);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 16);
+    hemiLight.position.set(0, 300, 0);
+    // make it wider
+    hemiLight.color.setHSL(0.6, 1, 0.6);
+    //hemiLight.color.setHSL(0.6, 1, 0.6);
+    scene.add(hemiLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 8);
+    directionalLight.position.set(75, 300, -75);
     scene.add(directionalLight);
+
     // add a blue gradient skybox to the scene
     const skyboxGeometry = new THREE.BoxGeometry(1000, 1000, 1000);
     const skyboxMaterial = new THREE.MeshBasicMaterial({ color: 0x88ccff, side: THREE.BackSide });
@@ -59,17 +62,25 @@ export function App() {
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
     loader.setDRACOLoader(dracoLoader);
+    const mixer = new THREE.AnimationMixer(scene);
     // load the car model from the preloaded gltf file
     // https://kaz-test-bucket.s3.amazonaws.com/models/car.gltf
-    loader.load('/models/car.gltf',
+    loader.load('/models/Benz_sls.glb',
         (gltf) => {
           var carModel = gltf.scene;
           // Adjust the scale as needed
-          carModel.scale.set(2, 2, 2);
+          carModel.scale.set(2.5, 2.5, 2.5);
           carModel.position.y = -2;
           scene.add(carModel);
-          //carModel = scene;
           console.log("Car Model", carModel);
+          // Testing Animation
+          try {
+            var anim_rim_spin = mixer.clipAction( gltf.animations[ 0 ] );
+            console.log("Animation", anim_rim_spin);
+            anim_rim_spin.play();
+          } catch (error) {
+            console.error(`(Animation error, model probably doesn't contain any)\n${error.message}`);
+          }
           // SCENE MODEL CUSTOMIZATION FUNCTIONS
           // storeModelMaterials() function
           function storeModelMaterials() {
@@ -88,7 +99,6 @@ export function App() {
           };
           const materialBank = storeModelMaterials();
           console.log("Material Bank", materialBank);
-
           // swapLayerMaterial() function
           function swapLayerMaterial(mesh, material) {
             carModel.traverse((child) => {
@@ -98,9 +108,8 @@ export function App() {
             });
             console.info(mesh, "material swapped to", material.name);
           };
-
           // changeLayerColor function
-          async function changeLayerColor(mesh, color) {
+          function changeLayerColor(mesh, color) {
             carModel.traverse((child) => {
               if (child.name === mesh) {
                 child.material.color.setHex(color);
@@ -111,22 +120,22 @@ export function App() {
 
           // Listen for UI events
           document.addEventListener('colorChange-body1', (event) => {
-            changeLayerColor('Mesh_body014', event.detail.color);
+            changeLayerColor('DesireFXME_Body_main', event.detail.color);
           });
           document.addEventListener('colorChange-body2', (event) => {
-            changeLayerColor('Mesh_body014_1', event.detail.color);
+            changeLayerColor('DesireFXME_Doors', event.detail.color);
           });
           document.addEventListener('materialSwap-body1', (event) => {
-            swapLayerMaterial('Mesh_body014', materialBank[event.detail.name]);
+            swapLayerMaterial('DesireFXME_Body_main', materialBank[event.detail.name]);
           });
           document.addEventListener('materialSwap-body2', (event) => {
-            swapLayerMaterial('Mesh_body014_1', materialBank[event.detail.name]);
+            swapLayerMaterial('DesireFXME_Doors', materialBank[event.detail.name]);
           });
           document.addEventListener('colorChange-wheel1', (event) => {
             changeLayerColor('Mesh_wheel_frontLeft028', event.detail.color);
           });
           document.addEventListener('colorChange-wheel2', (event) => {
-            changeLayerColor('Mesh_wheel_frontLeft028_2', event.detail.color);
+            changeLayerColor('DesireFXME_wheel_rim04', event.detail.color);
           });
           document.addEventListener('colorChange-windshield', (event) => {
             changeLayerColor('Mesh_body014_2', event.detail.color);
@@ -134,34 +143,34 @@ export function App() {
           document.addEventListener('materialSwap-windshield', (event) => {
             swapLayerMaterial('Mesh_body014_2', materialBank[event.detail.name]);
           });
-          // test smooth camera pan
-          moveCameraToPosition(4, -0.2, 5);
+          // startup smooth camera movement
+          moveCameraToPosition(0, 2, 15);
           // hookeup wasd controls
           document.addEventListener('keydown', (event) => {
             if (event.key == '1') {
-              moveCameraToPosition(0, 0, 5);
+              moveCameraToPosition(4, -0.2, 8);
               console.info("Moving to position 1:", camera.position.x, camera.position.y, camera.position.z);
             }
             if (event.key == '2') {
-              moveCameraToPosition(4, -0, 5); 
+              moveCameraToPosition(10, -0, 8); 
               console.info("Moving to position 2:", camera.position.x, camera.position.y, camera.position.z);
             }
             if (event.key == '3') {
-              moveCameraToPosition(4, -0, -0.5); 
+              moveCameraToPosition(10, -0, -0.5); 
               console.info("Moving to position 3:", camera.position.x, camera.position.y, camera.position.z);
             }
             if (event.key == '4') {
-              moveCameraToPosition(4, -1, -0.5);
+              moveCameraToPosition(10, 5, -0.5);
               console.info("Moving to position 4:", camera.position.x, camera.position.y, camera.position.z);
             }
           });
         }, 
         (xhr) => {
-          console.info('GLTF Model loaded', (xhr.loaded / xhr.total * 100) + '%');
+          //console.info('GLTF Model loaded', (xhr.loaded / xhr.total * 100) + '%');
           setTimeout(() => {
             // Remove loading text when model is loaded
             document.getElementById('loading-text').style.display = 'none';
-          }, 500);
+          }, 250);
         },
         (error) => {
           console.error(error);
@@ -170,13 +179,13 @@ export function App() {
     // Configure camera and controls
     camera.position.z = 5;
     const controls = new OrbitControls(camera, renderer.domElement); 
-    // Lock controls to x axis
-    controls.minPolarAngle = Math.PI / 2;
-    controls.maxPolarAngle = Math.PI / 2;
+    // Limit Max-Polar-Angle to prevent going through the floor
+    controls.maxPolarAngle = Math.PI / 2 - 0.1;
+
     controls.enablePan = false;
     // Lock distance from center
-    controls.minDistance = 4;
-    controls.maxDistance = 8;
+    controls.minDistance = 10;
+    controls.maxDistance = 15;
     controls.update();
     //console.log("Controls", controls)
     // function smoothly move camera to new position
@@ -188,24 +197,28 @@ export function App() {
     }
 
     // Press R to rotate camera
-    let rotationSpeed = 0.01;
+    let rotationSpeed = 0.000;
     document.addEventListener('keydown', (event) => {
-      if (event.key == 'r' && rotationSpeed == 0) {
-        rotationSpeed = 0.01;
-        console.log("Rotation Speed", rotationSpeed)
+      if (event.key == 'r' && rotationSpeed == 0.000) {
+        rotationSpeed = 0.001;
       }
-      else if (event.key == 'r' && rotationSpeed == 0.01) {
-        rotationSpeed = 0;
-        console.log("Rotation Speed", rotationSpeed)
+      else if (event.key == 'r' && rotationSpeed == 0.001) {
+        rotationSpeed = 0.000;
       }
     })
 
-    // render scene
+    // render scene loop 
     const animate = function () {
       requestAnimationFrame(animate);
 
       resizeCanvasToDisplaySize();
       TWEEN.update();
+
+      // animation mixer
+      if (mixer) {
+        mixer.update(0.01);
+      }
+
       scene.rotation.y += rotationSpeed; // Lazy Susan
       camera.lookAt(scene.position);
 
@@ -257,18 +270,18 @@ export function App() {
                 // create an event
                 document.dispatchEvent(new CustomEvent('materialSwap-body1', {
                   detail: {
-                    name: 'paintRed'
+                    name: 'Mercedes-Benz_SLS-class_2011_carpaint'
                   }
                 }));
-              }}>Glossy Red Paint</button>
+              }}>Mercedes Glossy Coat</button>
               <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('materialSwap-body1', {
                   detail: {
-                    name: 'plastic'
+                    name: 'Mercedes-Benz_SLS-class_2011_black'
                   }
                 }));
-              }}>PVC Model Plastic</button>
+              }}>Mercedes Matte Black</button>
             </ul>
           </div>
           <div className="controls-option">
@@ -307,18 +320,18 @@ export function App() {
                 // create an event
                 document.dispatchEvent(new CustomEvent('materialSwap-body2', {
                   detail: {
-                    name: 'paintRed'
+                    name: 'Mercedes-Benz_SLS-class_2011_carpaint'
                   }
                 }));
-              }}>Glossy Red Paint</button>
+              }}>Mercedes Glossy Coat</button>
               <button onClick={() => {
                 // create an event
                 document.dispatchEvent(new CustomEvent('materialSwap-body2', {
                   detail: {
-                    name: 'plastic'
+                    name: 'Mercedes-Benz_SLS-class_2011_black'
                   }
                 }));
-              }}>PVC Model Plastic</button>
+              }}>Mercedes Matte Black</button>
             </ul>
           </div>
           <div className="controls-option">
@@ -434,13 +447,13 @@ export function App() {
       <section id="readme">
         <section className="text-area">
           <h2>3D GLTF Customizer</h2>
-          <p>Version: 0.0.4</p>
+          <p>Version: 0.0.5</p>
           <p>Built By: Kazei McQuaid</p>
           <p>Purpose: 3D Car Customizer is a React-compatible Model viewer/customizer Component.</p>
           <h2>Features</h2>
           <ul>
             <li>- 1, 2, 3, 4 keys to move camera to preset angles.</li>
-            <li>- R key to put the Model on a lazy susan.</li>
+            <li>- Press the R key to put the 3D Model on a lazy susan (rotation).</li>
             <li>- Click, Drag, and Scoll/Pinch to rotate and zoom camera.</li>
             <li>- Dynamic Canvas resizing.</li>
             <li>- Material Swapping & Cloning.</li>

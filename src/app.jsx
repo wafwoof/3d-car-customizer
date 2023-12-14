@@ -167,10 +167,10 @@ export function App() {
         }, 
         (xhr) => {
           //console.info('GLTF Model loaded', (xhr.loaded / xhr.total * 100) + '%');
-          setTimeout(() => {
-            // Remove loading text when model is loaded
+          // Remove loading text when model is loaded
+          if (xhr.loaded / xhr.total * 100 == 100) {
             document.getElementById('loading-text').style.display = 'none';
-          }, 250);
+          }
         },
         (error) => {
           console.error(error);

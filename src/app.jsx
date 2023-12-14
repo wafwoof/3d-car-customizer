@@ -36,9 +36,6 @@ export function App() {
     // add light to scene
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
     hemiLight.position.set(0, 300, 0);
-    // make it wider
-    //hemiLight.color.setHSL(0.6, 1, 0.6);
-    //hemiLight.color.setHSL(0.6, 1, 0.6);
     scene.add(hemiLight);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(35, 300, -75);
@@ -151,7 +148,7 @@ export function App() {
           // hookeup wasd controls
           document.addEventListener('keydown', (event) => {
             if (event.key == '1') {
-              moveCameraToPosition(4, -0.2, 8);
+              moveCameraToPosition(4, -0.2, 10);
               console.info("Moving to position 1:", camera.position.x, camera.position.y, camera.position.z);
             }
             if (event.key == '2') {

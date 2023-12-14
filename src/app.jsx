@@ -34,14 +34,14 @@ export function App() {
       };
     };
     // add light to scene
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 16);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
     hemiLight.position.set(0, 300, 0);
     // make it wider
-    hemiLight.color.setHSL(0.6, 1, 0.6);
+    //hemiLight.color.setHSL(0.6, 1, 0.6);
     //hemiLight.color.setHSL(0.6, 1, 0.6);
     scene.add(hemiLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 8);
-    directionalLight.position.set(75, 300, -75);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(35, 300, -75);
     scene.add(directionalLight);
 
     // add a blue gradient skybox to the scene
@@ -121,18 +121,20 @@ export function App() {
           // Listen for UI events
           document.addEventListener('colorChange-body1', (event) => {
             changeLayerColor('DesireFXME_Body_main', event.detail.color);
+            changeLayerColor('DesireFXME_Front_bumper', event.detail.color);
           });
           document.addEventListener('colorChange-body2', (event) => {
             changeLayerColor('DesireFXME_Doors', event.detail.color);
           });
           document.addEventListener('materialSwap-body1', (event) => {
             swapLayerMaterial('DesireFXME_Body_main', materialBank[event.detail.name]);
+            swapLayerMaterial('DesireFXME_Front_bumper', materialBank[event.detail.name]);
           });
           document.addEventListener('materialSwap-body2', (event) => {
             swapLayerMaterial('DesireFXME_Doors', materialBank[event.detail.name]);
           });
           document.addEventListener('colorChange-wheel1', (event) => {
-            changeLayerColor('Mesh_wheel_frontLeft028', event.detail.color);
+            changeLayerColor('DesireFXME_Tire', event.detail.color);
           });
           document.addEventListener('colorChange-wheel2', (event) => {
             changeLayerColor('DesireFXME_wheel_rim04', event.detail.color);
@@ -241,7 +243,7 @@ export function App() {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-body1', {
                   detail: {
-                    color: 0xff0000
+                    color: 0xaa0000
                   }
                 }));
               }}>Red</button>
@@ -249,7 +251,7 @@ export function App() {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-body1', {
                   detail: {
-                    color: 0x00ff00
+                    color: 0x00aa00
                   }
                 }));
               }}>Green</button>
@@ -257,7 +259,7 @@ export function App() {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-body1', {
                   detail: {
-                    color: 0x0000ff
+                    color: 0x0000aa
                   }
                 }));
               }}>Blue</button>
@@ -341,6 +343,14 @@ export function App() {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
                   detail: {
+                    color: 0x555555
+                  }
+                }));
+              }}>Black</button>
+              <button onClick={() => {
+                // create an event
+                document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
+                  detail: {
                     color: 0xff0000
                   }
                 }));
@@ -349,18 +359,10 @@ export function App() {
                 // create an event
                 document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
                   detail: {
-                    color: 0x00ff00
+                    color: 0xffffff
                   }
                 }));
-              }}>Green</button>
-              <button onClick={() => {
-                // create an event
-                document.dispatchEvent(new CustomEvent('colorChange-wheel1', {
-                  detail: {
-                    color: 0x0000ff
-                  }
-                }));
-              }}>Blue</button>
+              }}>White</button>
             </ul>
           </div>
           <div className="controls-option">

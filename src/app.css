@@ -36,7 +36,7 @@ h1 {
 }
 #customizer #canvas {
   position: relative;
-  width: 100%;
+  width: 75%;
   height: 100%;
 }
 #customizer #canvas:hover {
@@ -70,9 +70,9 @@ h1 {
 }
 #customizer #controls .controls-option button {
   width: 100%;
-  height: 40px;
+  height: fit-content;
   font-size: 1.2rem;
-  border: outset 1px solid black;
+  border: 1px solid black;
   background-color: rgb(255, 255, 255);
   color: black;
   cursor: pointer;

@@ -62,7 +62,18 @@ export function App() {
     const mixer = new THREE.AnimationMixer(scene);
     // load the car model from the preloaded gltf file
     // https://kaz-test-bucket.s3.amazonaws.com/models/car.gltf
-    loader.load('/models/Benz_sls.glb',
+    // For Development load based on url filename
+    let model_file_path = '/models/Benz_sls.glb';
+    if (window.location.href.includes('car0')) {
+      model_file_path = '/models/test_car_0.glb';
+    }
+    else if (window.location.href.includes('car1')) {
+      model_file_path = '/models/Benz_sls.glb';
+    }
+    else if (window.location.href.includes('car2')) {
+      model_file_path = '/models/Benz_withanimation.glb';
+    }
+    loader.load(model_file_path,
         (gltf) => {
           var carModel = gltf.scene;
           // Adjust the scale as needed

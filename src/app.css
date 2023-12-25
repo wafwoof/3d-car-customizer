@@ -46,9 +46,10 @@ h1 {
   cursor: grabbing;
 }
 #customizer #controls {
+  display: flex;
+  width: 25%;
   background-color: rgb(178, 178, 178);
   border-left: 1px solid black;
-  display: flex;
   flex-direction: column;
   align-items: flex-start;
   overflow-y: scroll;
@@ -71,7 +72,8 @@ h1 {
 #customizer #controls .controls-option button {
   width: 100%;
   height: fit-content;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  padding: 3px;
   border: 1px solid black;
   background-color: rgb(255, 255, 255);
   color: black;
